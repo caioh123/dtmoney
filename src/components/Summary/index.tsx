@@ -1,14 +1,26 @@
-import React, { useContext } from 'react'
 import { Container } from './styles'
 import incomeImg from '../../assets/income.svg'
-import outcomeImg from '../../assets/outcome.svg'
 import totalImg from '../../assets/total.svg'
-import { TransactionsContext } from '../../TransactionsContext'
+import { useTransactions } from '../../hooks/useTransactions'
 
 export const Summary = () => {
-    const {transactions} = useContext(TransactionsContext)
+    const {transactions} = useTransactions()
 
-    console.log(transactions)
+    const summary = transactions.reduce((acc, curr) => {
+        if(curr.type === "deposit") {
+            acc.deposits += curr.amount;
+            acc.total += curr.amount
+        } else {
+            acc.withdraws += curr.amount
+            acc.total -= curr.amount
+        }
+
+        return acc
+    },{
+        deposits: 0,
+        withdraws:0,
+        total:0
+    })
 
     return (
         <Container>
@@ -20,16 +32,23 @@ export const Summary = () => {
                     <img src={incomeImg} alt="Entradas" />
                 </header>
                 <strong>
-                    R$1000,00
+                {new
+                Intl.NumberFormat("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL"
+                                }).format(summary.deposits)}
                 </strong>
             </div>
             <div>
                 <header>
                     <p>Saídas</p>
-                    <img src={outcomeImg} alt="Entradas" />
                 </header>
                 <strong>
-                   - R$500,00
+                - {new
+                Intl.NumberFormat("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL"
+                                }).format(summary.withdraws)}
                 </strong>
             </div>
             <div className="highlight-background">
@@ -38,7 +57,11 @@ export const Summary = () => {
                     <img src={totalImg} alt="Total" />
                 </header>
                 <strong>
-                    R$5000,00
+                {new
+                Intl.NumberFormat("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL"
+                                }).format(summary.total)}
                 </strong>
             </div>
 
